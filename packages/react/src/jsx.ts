@@ -4,8 +4,8 @@ import type {
     Key,
     Ref,
     Props,
-    ReactElement,
-    ElementType
+    ElementType,
+    ReactElementType
 } from "shared/ReactTypes";
 
 // ReactElement
@@ -15,7 +15,7 @@ const ReactElement = function (
     key: Key,
     ref: Ref,
     props: Props
-): ReactElement {
+): ReactElementType {
     const element = {
         $$typeof: REACT_ELEMENT_TYPE,
         type,
@@ -31,8 +31,8 @@ const ReactElement = function (
 export const jsx = function (
     type: ElementType,
     config: any,
-    ...maybeChildren: any
-) {
+    ...maybeChildren: any[]
+): ReactElementType {
     let key: Key = null;
     const props: Props = {};
     let ref: Ref = null;
@@ -41,7 +41,7 @@ export const jsx = function (
         const val = config[prop];
         if (prop === "key") {
             if (val !== undefined) {
-                key = "" + val;
+                key = String(val);
             }
             continue;
         }
@@ -58,7 +58,7 @@ export const jsx = function (
     }
 
     const maybeChildrenLength = maybeChildren.length;
-    if (maybeChildrenLength) {
+    if (maybeChildrenLength >= 1) {
         // [child] or [child1, child2, child3]
         if (maybeChildrenLength === 1) {
             props.children = maybeChildren[0];
