@@ -25,18 +25,18 @@ export const createUpdate = <State>(action: Action<State>): Update<State> => {
 };
 
 // 工厂方法 —— 创建原始更新队列
-export const createUpdateQueue = <Action>() => {
+export const createUpdateQueue = <State>() => {
     return {
         shared: {
             pending: null
         }
-    } as UpdateQueue<Action>;
+    } as UpdateQueue<State>;
 };
 
 // 快捷方法 —— 入列更新
-export const enqueueUpdate = <Action>(
-    UpdateQueue: UpdateQueue<Action>,
-    update: Update<Action>
+export const enqueueUpdate = <State>(
+    UpdateQueue: UpdateQueue<State>,
+    update: Update<State>
 ) => {
     UpdateQueue.shared.pending = update;
 };
