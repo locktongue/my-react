@@ -70,4 +70,9 @@ export const jsx = function (
     return ReactElement(type, key, ref, props);
 };
 
-export const jsxDev = jsx;
+export const jsxDEV = function (
+    type: ElementType,
+    config: any
+): ReactElementType {
+    return jsx(type, config);
+};

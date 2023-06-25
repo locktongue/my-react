@@ -7,7 +7,7 @@ import cjs from "@rollup/plugin-commonjs";
 const pkgPath = path.resolve(__dirname, "../../packages");
 const distPath = path.resolve(__dirname, "../../dist/node_modules");
 
-export function resolvePackagesPath(pkgName, isDist) {
+export function resolvePackagesPath(pkgName, isDist = false) {
     if (isDist) {
         return `${distPath}/${pkgName}`;
     }
