@@ -55,6 +55,24 @@ import { Flags, NoFlags } from "./fiberFlags";
       - 归：对应completeWork
 */
 
+/*
+  ReactDOM.createRoot(rootElement).render(<App />)
+
+      fiberRootNode
+        |       ^
+        |       |
+    current   stateNode
+        |       |
+        v       |
+      hostRootFiber
+        |       ^
+        |       |
+      child   return
+        |       |
+        v       |
+          App
+*/
+
 export class FiberNode {
     type: any;
     tag: WorkTag;

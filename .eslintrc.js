@@ -17,5 +17,7 @@ module.exports = {
         project: true
     },
     plugins: ["@typescript-eslint", "prettier"],
-    rules: {}
+    rules: {
+        "no-constant-condition": "off"
+    }
 };
