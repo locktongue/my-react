@@ -1,13 +1,14 @@
 import type { Props, Key, Ref } from "shared/ReactTypes";
 import type { WorkTag } from "./workTags";
 import { Flags, NoFlags } from "./fiberFlags";
+import type { Container } from "hostConfig";
 
 // ReactElement --- diff with ---> FiberNode --- gen ---> actions
 //                                      |
 //                                      |
 //                                      |
 //                                      v
-// childFiberNode
+// childReactElement             childFiberNode
 
 /*
   e.g: 
@@ -87,9 +88,11 @@ export class FiberNode {
     ref: Ref;
 
     memoizedProps: Props | null;
+    memoizedState: any;
 
     flags: Flags;
 
+    updateQueue: unknown;
     // current.alternate = workInProgress; workInprogress.altername = current;
     alternate: FiberNode | null;
 
@@ -117,10 +120,51 @@ export class FiberNode {
         // 工作单元属性
         this.pendingProps = pendingProps;
         this.memoizedProps = null;
+        this.memoizedState = null;
 
         this.alternate = null;
+        this.updateQueue = null;
 
         // 副作用/全部标记
         this.flags = NoFlags;
     }
 }
+
+export class FiberRootNode {
+    container: Container;
+    current: FiberNode;
+    finishedWork: FiberNode | null;
+    constructor(container: Container, hostRootFiber: FiberNode) {
+        this.container = container;
+        this.current = hostRootFiber;
+        hostRootFiber.stateNode = this;
+        this.finishedWork = null;
+    }
+}
+
+export const createWorkInProgress = (
+    current: FiberNode,
+    pendingProps: Props
+): FiberNode => {
+    let wip = current.alternate;
+
+    // 首屏渲染时
+    if (wip === null) {
+        // mount
+        wip = new FiberNode(current.tag, pendingProps, current.key);
+        wip.stateNode = current.stateNode;
+
+        wip.alternate = current;
+        current.alternate = wip;
+    } else {
+        // update
+        wip.pendingProps = current.pendingProps;
+        wip.flags = NoFlags;
+    }
+    wip.type = current.type;
+    wip.updateQueue = current.updateQueue;
+    wip.memoizedProps = current.memoizedProps;
+    wip.memoizedState = current.memoizedState;
+
+    return wip;
+};

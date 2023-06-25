@@ -18,9 +18,7 @@ export interface UpdateQueue<State> {
 }
 
 // 工厂方法 —— 创建更新
-export const createUpdate = <State>(
-    action: Action<State>
-): Update<Action<State>> => {
+export const createUpdate = <State>(action: Action<State>): Update<State> => {
     return {
         action
     };
