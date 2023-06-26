@@ -1,5 +1,65 @@
+import { ReactElementType } from "shared/ReactTypes";
+import { mountChildFibers, reconcileChildFibers } from "./childFibers";
 import { FiberNode } from "./fiber";
+import { processUpdateQueue, UpdateQueue } from "./updateQueue";
+import { HostComponent, HostRoot, HostText } from "./workTags";
 
-export const beginWork = (fiber: FiberNode): FiberNode => {
+export const beginWork = (wip: FiberNode) => {
     // 比较ReactElement和fiberNode，返回子FiberNode
+    switch (wip.tag) {
+        case HostRoot:
+            return updateHostRoot(wip);
+        case HostComponent:
+            return updateHostComponent(wip);
+        case HostText:
+            return null;
+        default:
+            if (__DEV__) {
+                console.warn("beginWork未实现的类型");
+            }
+            break;
+    }
 };
+
+/*
+  HostRoot工作流
+    1.计算状态的最新值
+    2.创建子FiberNode
+*/
+function updateHostRoot(wip: FiberNode) {
+    const baseState = wip.memoizedState;
+    const updateQueue = wip.updateQueue as UpdateQueue<Element>;
+    const pending = updateQueue.shared.pending;
+    updateQueue.shared.pending = null;
+
+    const { memoizedState } = processUpdateQueue(baseState, pending);
+    wip.memoizedState = memoizedState;
+
+    const nextChildren = wip.memoizedState;
+    reconcileChildren(wip, nextChildren);
+    return wip.child;
+}
+
+/*
+  HostComponent工作流
+    1.创建子FiberNode
+*/
+function updateHostComponent(wip: FiberNode) {
+    const { nextChildren } = wip.pendingProps;
+    reconcileChildren(wip, nextChildren);
+    return wip.child;
+}
+
+function reconcileChildren(wip: FiberNode, children?: ReactElementType) {
+    const current = wip.alternate;
+
+    if (current !== null) {
+        // update流程
+        wip.child = reconcileChildFibers(wip, current?.child, children);
+    } else {
+        // mount流程
+        wip.child = mountChildFibers(wip, null, children);
+    }
+
+    reconcileChildFibers(wip, current?.child, children);
+}

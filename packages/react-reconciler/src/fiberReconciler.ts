@@ -19,7 +19,8 @@ export function createContainer(container: Container) {
     return root;
 }
 
-// react.createRoot().render()时执行
+// react.createRoot().render(<App />)时执行
+// element = <App />
 export function updateContainer(
     element: ReactElementType | null,
     root: FiberRootNode
